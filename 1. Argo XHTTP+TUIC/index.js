@@ -305,10 +305,10 @@ except Exception as e:
 async function startCloudflared(argoArgs) {
   if (isExiting) return;
   try {
-    if (!fs.existsSync(botPath)) {
-      log("正在下载 Cloudflared...");
-      await downloadFile(cloudflaredUrl, botPath);
-    }
+    // 每次运行均拉取最新版 cloudflared：删除旧文件后重新下载
+    try { if (fs.existsSync(botPath)) fs.unlinkSync(botPath); } catch (e) {}
+    log("正在下载 Cloudflared...");
+    await downloadFile(cloudflaredUrl, botPath);
     fs.chmodSync(botPath, 0o775);
 
     log("[Argo] 检测到完整变量 (PORT+DOMAIN+AUTH)，启动固定隧道...");
